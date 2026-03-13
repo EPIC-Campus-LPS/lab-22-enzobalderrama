@@ -1,10 +1,16 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Sort {
-    public static void radixSort() throws FileNotFoundException {
+    /**
+     * Uses the radix sort to take from a file and sort it with one ArrayList per letter making an overall big list
+     * @throws IOException for when you're making a new file
+     * Will print the full sorted list that comes from the new txt file
+     */
+    public static ArrayList<String> radixSort() throws IOException{
         ArrayList<String> unsortedList = new ArrayList<>();
         File file = new File("some_file.txt");
         Scanner sc = new Scanner(file);
@@ -14,67 +20,49 @@ public class Sort {
 
 
         ArrayList<String> sortedList = unsortedList;
-        int letterNum;
-        for (int i = unsortedList.size(); i >= 0; i--) {
+        int max = -1;
+        for (String s : sortedList) {
+            if (s.length() > max) {
+                max = s.length();
+            }
+        }
+        int letterNum = 0;
+        for (int i = max-1; i >= 0; i--) {
             ArrayList<ArrayList<String>> letterCats = new ArrayList<>(27);
             for (int j = 0; j < 27; j++) {
                 letterCats.add(new ArrayList<String>());
             }
-            for
+            for (String k: sortedList){
+                letterNum = 0;
+                if (i < k.length()){
+                    letterNum = toNum(k.substring(i,i+1));
+                }
+                letterCats.get(letterNum).add(k);
+            }
+
+            sortedList.clear();
+            for (ArrayList<String> loopOne : letterCats) {
+                for (String loopTwo : loopOne) {
+                    sortedList.add(loopTwo);
+                }
+            }
         }
 
 
-
-
-        File newFile = new File("some_file_key.txt");
-        writeFile(outputName, sortedResult);
+        FileWriter writer = new FileWriter("some_file_key.txt");
+        for (String str: sortedList){
+            writer.write(str + System.lineSeparator());
+        }
+        writer.close();
+        System.out.println(writer);
+        return sortedList;
     }
 
-//String extraHassle = unsortedList.get(i);
-//                letterNum = Sort.toNum(extraHassle.substring(j,j+1).toLowerCase());
-//                if (sortedList.isEmpty()) {
-//                    sortedList.add(extraHassle);
-//                }
-//                else {
-//                    if (letterNum < Sort.toNum(sortedList.get(j).substring(j,j+1))) {
-//                        sortedList.add(j, extraHassle);
-//                    }
-//                    else {
-//                        sortedList.add(j-1, extraHassle);
-//                    }
-//                }
-    //// This is the core Radix Sort logic using your toNum concept
-    //    public static ArrayList<String> radixSort(ArrayList<String> list, int maxLen) {
-    //        ArrayList<String> currentList = list;
-    //
-    //        // We go from the LAST character to the FIRST (LSD Radix Sort)
-    //        for (int d = maxLen - 1; d >= 0; d--) {
-    //            // 1. Create 27 buckets (0 for 'end of word', 1-26 for a-z)
-    //            ArrayList<ArrayList<String>> buckets = new ArrayList<>(27);
-    //            for (int i = 0; i < 27; i++) buckets.add(new ArrayList<>());
-    //
-    //            // 2. Put each word into a bucket based on the character at position d
-    //            for (String word : currentList) {
-    //                int charIdx;
-    //                if (d < word.length()) {
-    //                    // Use your toNum logic on the specific character
-    //                    charIdx = toNum(word.substring(d, d + 1));
-    //                } else {
-    //                    charIdx = 0; // Word is shorter than d, goes to the "empty" bucket
-    //                }
-    //                buckets.get(charIdx).add(word);
-    //            }
-    //
-    //            // 3. Collect words back from buckets into the list
-    //            ArrayList<String> nextPass = new ArrayList<>();
-    //            for (ArrayList<String> bucket : buckets) {
-    //                nextPass.addAll(bucket);
-    //            }
-    //            currentList = nextPass;
-    //        }
-    //        return currentList;
-    //    }
-
+    /**
+     * @param s length 1 substring
+     * @return number version of s, 1-26
+     * If not applicable, return 0
+     */
     public static int toNum(String s){
         s = s.toLowerCase();
         return switch (s) {
@@ -104,7 +92,7 @@ public class Sort {
             case "x" -> 24;
             case "y" -> 25;
             case "z" -> 26;
-            default -> -1;
+            default -> 0;
         };
     }
 }
